@@ -24,6 +24,9 @@ class Employee extends Model
         ];
 
     public function salaries(){
-        $this->hasMany(MonthlyEmployeeSalary::class ,'employee_id');
+        return $this->hasMany(MonthlyEmployeeSalary::class ,'employee_id');
     }
+    protected $casts =[
+        'days_worked' => 'array'
+    ] ;
 }

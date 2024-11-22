@@ -13,9 +13,6 @@ class PurchaseAndMaintenance extends Model
         'date',
         'quantity',
         'unit_cost',
-        'total_cost',
         'total_paid',
-        'total_invoices',
-        'total_remaining',
     ];
 }

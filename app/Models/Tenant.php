@@ -9,13 +9,17 @@ class Tenant extends Model
 {
     use HasFactory;
     protected $fillable=[
-        'full_name','id_number','phone_number','address','id_image'
+        'full_name',
+        'id_number',
+        'phone_number',
+        'address',
+        'id_image'
     ];
 
     public function estates(){
-        $this->belongsToMany(Estate::class ,'rental_contracts');
+        return $this->belongsToMany(Estate::class ,'rental_contracts' , 'tenant_id' , 'estate_id');
     }
     public function contracts(){
-        $this->hasMany(RentalContract::class ,'tenant_id');
+        return $this->hasMany(RentalContract::class ,'tenant_id');
     }
 }

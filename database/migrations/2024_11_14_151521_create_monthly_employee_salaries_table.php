@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('monthly_employee_salaries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id');
+            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->integer('main_salary');
             $table->integer('bonus');
             $table->integer('daily_amount');

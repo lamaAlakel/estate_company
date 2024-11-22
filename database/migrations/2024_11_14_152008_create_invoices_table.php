@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreign('estate_id');
+            $table->foreignId('estate_id')->constrained('estates')->cascadeOnDelete();
             $table->string('meter_number');
             $table->string('account_number');
             $table->integer('total_invoice_amount');

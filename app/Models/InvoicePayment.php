@@ -14,6 +14,6 @@ class InvoicePayment extends Model
         'date'
     ];
     public function invoice(){
-        $this->belongsTo(Invoice::class ,'invoice_id');
+        return $this->belongsTo(Invoice::class ,'invoice_id');
     }
 }

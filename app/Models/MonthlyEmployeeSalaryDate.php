@@ -14,6 +14,6 @@ class MonthlyEmployeeSalaryDate extends Model
         'amount'
     ];
     public function salary(){
-        $this->belongsTo(MonthlyEmployeeSalary::class , 'monthly_employee_salary_id');
+        return $this->belongsTo(MonthlyEmployeeSalary::class , 'monthly_employee_salary_id');
     }
 }

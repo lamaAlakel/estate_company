@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('monthly_employee_salary_dates', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->foreignId('monthly_employee_salary_id');
+            $table->foreignId('monthly_employee_salary_id')->constrained('monthly_employee_salaries')->cascadeOnDelete();
             $table->integer('amount');
             $table->timestamps();
         });

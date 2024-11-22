@@ -17,10 +17,10 @@ class Invoice extends Model
         'date'
     ];
     public function payments(){
-        $this->hasMany(InvoicePayment::class ,'invoice_id');
+        return $this->hasMany(InvoicePayment::class ,'invoice_id');
     }
     public function estate(){
-        $this->belongsTo(Estate::class , 'estate_id');
+        return $this->belongsTo(Estate::class , 'estate_id');
     }
 
 }

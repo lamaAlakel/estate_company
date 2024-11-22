@@ -17,9 +17,9 @@ class MonthlyEmployeeSalary extends Model
         'date_should_translate_to_month'
     ];
     public function employee(){
-        $this->belongsTo(Employee::class ,'employee_id');
+        return $this->belongsTo(Employee::class ,'employee_id');
     }
     public function salaryDates(){
-        $this->hasMany(MonthlyEmployeeSalaryDate::class ,'monthly_employee_salary_id');
+        return $this->hasMany(MonthlyEmployeeSalaryDate::class ,'monthly_employee_salary_id');
     }
 }

@@ -17,10 +17,7 @@ return new class extends Migration
             $table->date('date');
             $table->integer('quantity');
             $table->integer('unit_cost');
-            $table->integer('total_cost');
             $table->integer('total_paid');
-            $table->integer('total_invoices');
-            $table->integer('total_remaining');
             $table->timestamps();
         });
     }

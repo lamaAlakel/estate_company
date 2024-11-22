@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->integer('amount');
-            $table->foreignId('rental_contract_id');
+            $table->foreignId('rental_contract_id')->constrained('rental_contracts')->cascadeOnDelete();
             $table->timestamps();
         });
     }

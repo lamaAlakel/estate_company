@@ -18,14 +18,14 @@ class RentalContract extends Model
     ];
 
     public function payments(){
-        $this->hasMany(RentalContractPayment::class,'rental_contract_id');
+        return $this->hasMany(RentalContractPayment::class,'rental_contract_id');
     }
 
     public function estate(){
-        $this->belongsTo(Estate::class ,'estate_id');
+        return $this->belongsTo(Estate::class ,'estate_id');
     }
 
     public function tenant(){
-        $this->belongsTo(Tenant::class ,'tenant_id');
+      return  $this->belongsTo(Tenant::class ,'tenant_id');
     }
 }
