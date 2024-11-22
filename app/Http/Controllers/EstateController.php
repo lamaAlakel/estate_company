@@ -17,24 +17,28 @@ class EstateController extends Controller
     {
         $currentDate = Carbon::now();
 
-        $estates = Estate::with(['contracts' => function ($query) {
-            // Filter for current contracts
-            $query->where('is_current', true);
-        }])
-            ->get()
-            ->map(function ($estate) {
-                // Check if the estate has any current contracts
-                if ($estate->contracts->isEmpty()) {
-                    // Remove the 'contracts' relation if no current contract exists
-                    $estate->unsetRelation('contracts');
-                }
-                return $estate;
-            });
+        // Get estates with current contracts and their details
+        $estatesWithCurrentContracts = Estate::whereHas('contracts', function ($query) use ($currentDate) {
+            $query->where('rent_start_date', '<=', $currentDate)
+                ->where('rent_end_date', '>=', $currentDate);
+        })->with(['contracts' => function ($query) use ($currentDate) {
+            $query->where('rent_start_date', '<=', $currentDate)
+                ->where('rent_end_date', '>=', $currentDate)
+                ->with('tenant');
+        }])->get();
+
+        // Get estates without current contracts
+        $estatesWithoutCurrentContracts = Estate::whereDoesntHave('contracts', function ($query) use ($currentDate) {
+            $query->where('rent_start_date', '<=', $currentDate)
+                ->where('rent_end_date', '>=', $currentDate);
+        })->get();
+
+        // Combine both lists
+        $estates = $estatesWithCurrentContracts->merge($estatesWithoutCurrentContracts);
 
         return response()->json([
-            'estates'=> $estates
+            'estates' => $estates
         ]);
-
     }
 
 
