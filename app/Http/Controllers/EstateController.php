@@ -16,14 +16,21 @@ class EstateController extends Controller
     public function index()
     {
         $currentDate = Carbon::now();
-        $estates = Estate::whereHas('contracts', function ($query) use ($currentDate) {
-            $query->where('rent_start_date', '<=', $currentDate)
-                ->where('rent_end_date', '>=', $currentDate);
-        })->with(['contracts' => function ($query) use ($currentDate) {
-            $query->where('rent_start_date', '<=', $currentDate)
-                ->where('rent_end_date', '>=', $currentDate)
-                ->with('tenant');
-        }])->get();
+
+        $estates = Estate::with(['contracts' => function ($query) {
+            // Filter for current contracts
+            $query->where('is_current', true);
+        }])
+            ->get()
+            ->map(function ($estate) {
+                // Check if the estate has any current contracts
+                if ($estate->contracts->isEmpty()) {
+                    // Remove the 'contracts' relation if no current contract exists
+                    $estate->unsetRelation('contracts');
+                }
+                return $estate;
+            });
+
         return response()->json([
             'estates'=> $estates
         ]);
