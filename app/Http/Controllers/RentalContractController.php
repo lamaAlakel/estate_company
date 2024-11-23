@@ -111,7 +111,8 @@ class RentalContractController extends Controller
             'tenant_id'=>$request['tenant_id']
         ]);
         return response()->json([
-            'message'=> 'updated successfully'
+            'message'=> 'updated successfully',
+
         ]);
     }
 

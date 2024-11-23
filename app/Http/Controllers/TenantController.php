@@ -23,7 +23,7 @@ class TenantController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -31,7 +31,17 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
-        //
+     $tenant = Tenant::create([
+         'full_name'=> $request['full_name'],
+         'id_number' => $request['id_number'],
+         'phone_number'=> $request['phone_number'],
+         'address'=> $request['address'],
+         'id_image' => $request['id_image']
+     ]);
+     $tenant->save();
+     return response()->json([
+         'message'=> 'added tenant successfully'
+     ]);
     }
 
     /**
@@ -55,7 +65,24 @@ class TenantController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $tenant = Tenant::find($id);
+        if(!$tenant) {
+            return response()->json([
+                'message' => 'no tenant'
+            ]);
+        }
+        $tenant->update([
+            'full_name'=> $request['full_name'],
+            'id_number' => $request['id_number'],
+            'phone_number'=> $request['phone_number'],
+            'address'=> $request['address'],
+            'id_image' => $request['id_image']
+            ]);
+            return response()->json([
+                'message'=>'updated successfully' ,
+                'tenant'=> $tenant
+            ]);
+
     }
 
     /**
@@ -63,7 +90,10 @@ class TenantController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $tenant = Tenant::find($id);
+        if (!$tenant){
+
+        }
     }
 
 

@@ -113,7 +113,8 @@ class RentalContractPaymentController extends Controller
 
         ]);
         return response()->json([
-            'message'=> 'updated successfully'
+            'message'=> 'updated successfully',
+            'payment '=> $payment
         ]);
 
     }
