@@ -98,7 +98,9 @@ class EstateController extends Controller
     ]);
 
         return response()->json([
-            'message'=> 'updated successfully']);
+            'message'=> 'updated successfully' ,
+            'estate' => $estate
+        ]);
 
     }
 
@@ -137,9 +139,7 @@ class EstateController extends Controller
                 }
             });
         return response()->json([
-            'estate'=> $estate ,
-            'message'=> true,
-            $estate->get()
+            'data'=> $estate->get(),
         ]);
     }
 
