@@ -16,7 +16,9 @@ class EstateController extends Controller
     public function index()
     {
         $currentDate = Carbon::now();
-        $estates = Estate::whereHas('contracts', function ($query) use ($currentDate) {
+
+        // Get estates with current contracts and their details
+        $estatesWithCurrentContracts = Estate::whereHas('contracts', function ($query) use ($currentDate) {
             $query->where('rent_start_date', '<=', $currentDate)
                 ->where('rent_end_date', '>=', $currentDate);
         })->with(['contracts' => function ($query) use ($currentDate) {
@@ -24,10 +26,19 @@ class EstateController extends Controller
                 ->where('rent_end_date', '>=', $currentDate)
                 ->with('tenant');
         }])->get();
-        return response()->json([
-            'estates'=> $estates
-        ]);
 
+        // Get estates without current contracts
+        $estatesWithoutCurrentContracts = Estate::whereDoesntHave('contracts', function ($query) use ($currentDate) {
+            $query->where('rent_start_date', '<=', $currentDate)
+                ->where('rent_end_date', '>=', $currentDate);
+        })->get();
+
+        // Combine both lists
+        $estates = $estatesWithCurrentContracts->merge($estatesWithoutCurrentContracts);
+
+        return response()->json([
+            'estates' => $estates
+        ]);
     }
 
 
@@ -87,7 +98,9 @@ class EstateController extends Controller
     ]);
 
         return response()->json([
-            'message'=> 'updated successfully']);
+            'message'=> 'updated successfully' ,
+            'estate' => $estate
+        ]);
 
     }
 
@@ -126,9 +139,7 @@ class EstateController extends Controller
                 }
             });
         return response()->json([
-            'estate'=> $estate ,
-            'message'=> true,
-            $estate->get()
+            'data'=> $estate->get(),
         ]);
     }
 

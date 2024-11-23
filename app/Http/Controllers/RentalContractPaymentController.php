@@ -17,7 +17,6 @@ class RentalContractPaymentController extends Controller
         return response()->json([
             'payments' => $payments
         ]);
-
     }
 
 
@@ -30,7 +29,7 @@ class RentalContractPaymentController extends Controller
             ]);
         }
         return response()->json([
-            'payment' => $payments,
+            'payments' => $payments,
         ]);
     }
 
@@ -46,18 +45,6 @@ class RentalContractPaymentController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-        //  {
-        //    $payment = RentalContractPayment::create([
-        //       'date'=>$request['date'],
-        //      'amount'=>$request['amount'],
-        //    'rental_contract_id'=>$request['rental_contract_id'],
-        //]);
-        //$payment->save();
-        //return response()->json([
-        //  'message'=>'created successfully',
-        //'payment'=> $payment ,
-        //]);
-        //}
     {
         $validated = $request->validate([
             'date' => 'required|date',
