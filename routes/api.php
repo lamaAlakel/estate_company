@@ -27,9 +27,11 @@ Route::get('contract/index/{estate_id}',[\App\Http\Controllers\RentalContractCon
 Route::post('filter-contract',[\App\Http\Controllers\RentalContractController::class,'filterContracts']);
 
 
-Route::apiResource('tenant', \App\Http\Controllers\TenantController::class);
-
 
 Route::apiResource('contractPayment', \App\Http\Controllers\RentalContractPaymentController::class);
 Route::get('contractPayment/index/{contract_id}',[\App\Http\Controllers\RentalContractPaymentController::class,'indexByContract']);
-Route::post('filter-contractPayment',[\App\Http\Controllers\RentalContractPaymentController::class,'filterPayments']);
+Route::post('contractPayment/filter',[\App\Http\Controllers\RentalContractPaymentController::class,'scopeFilter']);
+
+
+Route::apiResource('tenant', \App\Http\Controllers\TenantController::class);
+Route::post('tenant/search',[\App\Http\Controllers\TenantController::class ,'searchTenant']);

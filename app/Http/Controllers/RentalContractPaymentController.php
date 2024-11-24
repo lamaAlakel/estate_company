@@ -19,7 +19,6 @@ class RentalContractPaymentController extends Controller
         ]);
     }
 
-
     public function indexByContract($rental_contract_id)
     {
         $payments = RentalContractPayment:: where('rental_contract_id', $rental_contract_id)->get();
@@ -123,16 +122,28 @@ class RentalContractPaymentController extends Controller
         ]);
     }
 
-    public function filterPayments(Request $request)
+    public function scopeFilter($query, $request)
     {
-        $filters = $request->only(['rental_contract_id', 'date_from', 'date_to', 'min_amount', 'max_amount']);
-
-        $payments = RentalContractPayment::filterPayments($filters);
-
-        if ($payments->isEmpty()) {
-            return response()->json(['message' => 'No payments found'], 404);
+        if (isset($request['date_from']) && isset($request['date_to'])) {
+            $query->whereBetween('date', [$request['date_from'], $request['date_to']]);
         }
 
-        return response()->json(['payments' => $payments], 200);
+        if (isset($request['min_amount'])) {
+            $query->where('amount', '>=', $request['min_amount']);
+        }
+
+        if (isset($request['max_amount'])) {
+            $query->where('amount', '<=', $request['max_amount']);
+        }
+
+        if (isset($request['rental_contract_id'])) {
+            $query->where('rental_contract_id', $request['rental_contract_id']);
+        }
+        $query1= $query->get();
+        return response()->json([
+            'query'=> $query1
+        ]);
+
     }
+
 }

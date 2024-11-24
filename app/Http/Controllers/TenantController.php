@@ -92,8 +92,26 @@ class TenantController extends Controller
     {
         $tenant = Tenant::find($id);
         if (!$tenant){
-
+            return response()->json([
+                'message'=> 'no tenant',
+            ]);
         }
+        $tenant->delete();
+        return response()->json([
+            'message'=>'deleted successfully',
+        ]);
+    }
+
+
+    public function searchTenant(Request $request)
+    {
+        $search = $request->input('search');
+        $tenant = Tenant::where('full_name', 'like', "%$search%")
+            ->orWhere('id_number', 'like', "%$search%")
+           ->get();
+        return response()->json([
+            'result'=> $tenant
+        ]);
     }
 
 

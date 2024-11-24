@@ -95,7 +95,6 @@ class RentalContractController extends Controller
      */
     public function update(Request $request, string $id)
     {
-
         $contract = RentalContract:: find($id);
         if(!$contract){
             return response()->json([
@@ -112,7 +111,7 @@ class RentalContractController extends Controller
         ]);
         return response()->json([
             'message'=> 'updated successfully',
-
+            'contract'=> $contract
         ]);
     }
 
@@ -167,8 +166,7 @@ class RentalContractController extends Controller
         }
 
         return response()->json([
-            'query'=> $query ,
-            $query->get()
+            'query'=> $query->get() ,
         ]);
     }
 
