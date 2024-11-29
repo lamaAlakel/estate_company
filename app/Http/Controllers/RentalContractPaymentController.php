@@ -102,7 +102,6 @@ class RentalContractPaymentController extends Controller
             'message'=> 'updated successfully',
             'payment '=> $payment
         ]);
-
     }
 
     /**

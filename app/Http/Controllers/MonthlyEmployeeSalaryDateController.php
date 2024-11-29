@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MonthlyEmployeeSalaryDate;
 use Illuminate\Http\Request;
 
 class MonthlyEmployeeSalaryDateController extends Controller
@@ -35,7 +36,10 @@ class MonthlyEmployeeSalaryDateController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $date = MonthlyEmployeeSalaryDate::find($id);
+        return response()->json([
+            'dates'=>$date
+        ]);
     }
 
     /**

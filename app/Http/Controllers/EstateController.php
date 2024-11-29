@@ -95,7 +95,7 @@ class EstateController extends Controller
         } $estate ->update([
             'code'=>$request['code'],
             'type'=>$request['type']
-    ]);
+            ]);
 
         return response()->json([
             'message'=> 'updated successfully' ,

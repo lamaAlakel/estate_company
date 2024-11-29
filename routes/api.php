@@ -35,3 +35,15 @@ Route::post('contractPayment/filter',[\App\Http\Controllers\RentalContractPaymen
 
 Route::apiResource('tenant', \App\Http\Controllers\TenantController::class);
 Route::post('tenant/search',[\App\Http\Controllers\TenantController::class ,'searchTenant']);
+
+
+Route::apiResource('employee', \App\Http\Controllers\EmployeeController::class);
+Route::post('employee/search',[\App\Http\Controllers\EmployeeController::class ,'searchEmployee']);
+
+
+Route::apiResource('salary', \App\Http\Controllers\MonthlyEmployeeSalaryController::class);
+
+
+Route::apiResource('salaryDate', \App\Http\Controllers\MonthlyEmployeeSalaryController::class);
+
+
