@@ -20,7 +20,8 @@ class Employee extends Model
         'UAE_residency_number',
         'unified_number',
         'salary',
-        'days_worked'
+        'days_worked',
+        'position'
         ];
 
     public function salaries(){

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use http\Env\Response;
 use Illuminate\Http\Request;
-
 class EmployeeController extends Controller
 {
     /**
@@ -44,7 +43,8 @@ class EmployeeController extends Controller
             'UAE_residency_number'=>$request['UAE_residency_number'],
             'unified_number'=>$request['unified_number'],
             'salary'=>$request['salary'],
-            'days_worked'=>$request['days_worked']
+            'days_worked'=>$request['days_worked'],
+            'position'=>$request['position']
         ]);
         $employee->save();
         return response()->json([
@@ -101,6 +101,7 @@ class EmployeeController extends Controller
             'unified_number'=>$request['unified_number'],
             'salary'=>$request['salary'],
             'days_worked'=>$request['days_worked'] ,
+            'position'=>$request['position']
         ]);
         return response()->json([
             'message'=>'update successfully',

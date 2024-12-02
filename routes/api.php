@@ -44,6 +44,6 @@ Route::post('employee/search',[\App\Http\Controllers\EmployeeController::class ,
 Route::apiResource('salary', \App\Http\Controllers\MonthlyEmployeeSalaryController::class);
 
 
-Route::apiResource('salaryDate', \App\Http\Controllers\MonthlyEmployeeSalaryController::class);
+Route::apiResource('salaryDate', \App\Http\Controllers\MonthlyEmployeeSalaryDateController::class);
 
 

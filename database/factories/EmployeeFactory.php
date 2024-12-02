@@ -21,6 +21,7 @@ class EmployeeFactory extends Factory
             'unified_number' => $this->faker->numerify('########'),
             'salary' => $this->faker->numberBetween(5000, 20000),
             'days_worked' => json_encode($this->faker->randomElements(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], 5)),
+            'position'=>$this->faker->jobTitle(),
         ];
     }
 }

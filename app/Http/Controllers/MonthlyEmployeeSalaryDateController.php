@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MonthlyEmployeeSalary;
 use App\Models\MonthlyEmployeeSalaryDate;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,10 @@ class MonthlyEmployeeSalaryDateController extends Controller
      */
     public function index()
     {
-        //
+        $date = MonthlyEmployeeSalaryDate::with('salary')->get();
+        return response()->json([
+            'date'=> $date
+        ]);
     }
 
     /**

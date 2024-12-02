@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Traits\ImageTrait;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
 
 class TenantController extends Controller
 {
+    use ImageTrait;
     /**
      * Display a listing of the resource.
      */
@@ -23,20 +24,24 @@ class TenantController extends Controller
      */
     public function create()
     {
-
+        //
     }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
+            $path = null ;
+        if ($request->hasFile('id_image'))
+        {
+            $path = $this->storefile($request->file('id_image') , 'Tenant/id_image') ;
+        }
      $tenant = Tenant::create([
          'full_name'=> $request['full_name'],
          'id_number' => $request['id_number'],
          'phone_number'=> $request['phone_number'],
          'address'=> $request['address'],
-         'id_image' => $request['id_image']
+         'id_image' => $path ,
      ]);
      $tenant->save();
      return response()->json([
@@ -71,18 +76,22 @@ class TenantController extends Controller
                 'message' => 'no tenant'
             ]);
         }
+        $path = null ;
+        if ($request->hasFile('id_image'))
+        {
+            $path = $this->storefile($request->file('id_image') , 'Tenant/id_image') ;
+        }
         $tenant->update([
             'full_name'=> $request['full_name'],
             'id_number' => $request['id_number'],
             'phone_number'=> $request['phone_number'],
             'address'=> $request['address'],
-            'id_image' => $request['id_image']
+            'id_image' => $path ,
             ]);
             return response()->json([
                 'message'=>'updated successfully' ,
                 'tenant'=> $tenant
             ]);
-
     }
 
     /**
@@ -101,7 +110,6 @@ class TenantController extends Controller
             'message'=>'deleted successfully',
         ]);
     }
-
 
     public function searchTenant(Request $request)
     {

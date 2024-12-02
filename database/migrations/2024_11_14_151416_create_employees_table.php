@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('unified_number');
             $table->integer('salary');
             $table->json('days_worked');
+            $table->string('position');
             $table->timestamps();
         });
     }
