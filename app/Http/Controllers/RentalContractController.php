@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Estate;
 use App\Models\RentalContract;
+use App\Models\Tenant;
 use http\Env\Response;
 use Illuminate\Http\Request;
 
@@ -169,5 +170,20 @@ class RentalContractController extends Controller
             'query'=> $query->get() ,
         ]);
     }
+
+    public function showContractBYTenant($tenant_id){
+
+        $contract = RentalContract::where('tenant_id',$tenant_id)->get();
+        if (!$contract){
+            return response()->json([
+                'message'=>'not found'
+            ]);
+        }
+        return response()->json([
+            'contract'=>$contract
+        ]);
+
+    }
+
 
 }

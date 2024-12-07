@@ -126,4 +126,21 @@ class MonthlyEmployeeSalaryController extends Controller
             'message'=>'deleted successfully'
         ]);
     }
+    public function getPendingSalaries($employeeId)
+    {
+        $salaries = MonthlyEmployeeSalary::where('employee_id', $employeeId)
+            ->with('salaryDates')
+            ->get();
+
+        $pendingSalaries = $salaries->filter(function ($salary) {
+            $totalSalary = $salary->main_salary + $salary->bonus;
+            $totalPaid = $salary->salaryDates->sum('amount');
+            return $totalPaid < $totalSalary;
+        });
+
+        return response()->json([
+            'employee_id' => $employeeId,
+            'pending_salaries' => $pendingSalaries->values()
+        ]);
+    }
 }
