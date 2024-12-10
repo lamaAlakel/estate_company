@@ -39,7 +39,7 @@ Route::post('tenant/search',[\App\Http\Controllers\TenantController::class ,'sea
 
 Route::apiResource('employee', \App\Http\Controllers\EmployeeController::class);
 Route::post('employee/search',[\App\Http\Controllers\EmployeeController::class ,'searchEmployee']);
-Route::post('employee/getAttendance/{$employeeId}',[\App\Http\Controllers\EmployeeController::class ,'getAttendance']);
+Route::post('employee/workedDays/{employeeId}',[\App\Http\Controllers\EmployeeController::class ,'getEmployeeWorkDays']);
 
 
 

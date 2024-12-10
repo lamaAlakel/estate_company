@@ -14,7 +14,7 @@ class EmployeeController extends Controller
     {
         $employee = Employee::all();
         return response()->json([
-            'employee'=>$employee
+            'employee' => $employee
         ]);
     }
 
@@ -31,25 +31,25 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        $employee =Employee::create([
-            'name'=>$request['name'],
-            'nationality'=>$request['nationality'],
-            'date_of_birth'=>$request['date_of_birth'],
-            'work_type'=>$request['work_type'],
-            'health_insurance_expiration_date'=>$request['health_insurance_expiration_date'],
-            'visa_start_date'=>$request['visa_start_date'],
-            'visa_expiration_date'=>$request['visa_expiration_date'],
-            'passport_expiration_date'=>$request['passport_expiration_date'],
-            'UAE_residency_number'=>$request['UAE_residency_number'],
-            'unified_number'=>$request['unified_number'],
-            'salary'=>$request['salary'],
-            'days_worked'=>$request['days_worked'],
-            'position'=>$request['position']
+        $employee = Employee::create([
+            'name' => $request['name'],
+            'nationality' => $request['nationality'],
+            'date_of_birth' => $request['date_of_birth'],
+            'work_type' => $request['work_type'],
+            'health_insurance_expiration_date' => $request['health_insurance_expiration_date'],
+            'visa_start_date' => $request['visa_start_date'],
+            'visa_expiration_date' => $request['visa_expiration_date'],
+            'passport_expiration_date' => $request['passport_expiration_date'],
+            'UAE_residency_number' => $request['UAE_residency_number'],
+            'unified_number' => $request['unified_number'],
+            'salary' => $request['salary'],
+            'days_worked' => $request['days_worked'],
+            'position' => $request['position']
         ]);
         $employee->save();
         return response()->json([
-            'message'=>'created employee successfully',
-            'employee'=>$employee
+            'message' => 'created employee successfully',
+            'employee' => $employee
         ]);
     }
 
@@ -59,13 +59,13 @@ class EmployeeController extends Controller
     public function show(string $id)
     {
         $employee = Employee::find($id);
-        if(!$employee){
+        if (!$employee) {
             return response()->json([
-                'message'=>'no employee'
+                'message' => 'no employee'
             ]);
         }
         return response()->json([
-            'employee'=>$employee
+            'employee' => $employee
         ]);
     }
 
@@ -83,29 +83,29 @@ class EmployeeController extends Controller
     public function update(Request $request, string $id)
     {
         $employee = Employee::find($id);
-        if(!$employee){
+        if (!$employee) {
             return response()->json([
-                'message'=>'no employee'
+                'message' => 'no employee'
             ]);
         }
         $employee->update([
-            'name'=>$request['name'],
-            'nationality'=>$request['nationality'],
-            'date_of_birth'=>$request['date_of_birth'],
-            'work_type'=>$request['work_type'],
-            'health_insurance_expiration_date'=>$request['health_insurance_expiration_date'],
-            'visa_start_date'=>$request['visa_start_date'],
-            'visa_expiration_date'=>$request['visa_expiration_date'],
-            'passport_expiration_date'=>$request['passport_expiration_date'],
-            'UAE_residency_number'=>$request['UAE_residency_number'],
-            'unified_number'=>$request['unified_number'],
-            'salary'=>$request['salary'],
-            'days_worked'=>$request['days_worked'] ,
-            'position'=>$request['position']
+            'name' => $request['name'],
+            'nationality' => $request['nationality'],
+            'date_of_birth' => $request['date_of_birth'],
+            'work_type' => $request['work_type'],
+            'health_insurance_expiration_date' => $request['health_insurance_expiration_date'],
+            'visa_start_date' => $request['visa_start_date'],
+            'visa_expiration_date' => $request['visa_expiration_date'],
+            'passport_expiration_date' => $request['passport_expiration_date'],
+            'UAE_residency_number' => $request['UAE_residency_number'],
+            'unified_number' => $request['unified_number'],
+            'salary' => $request['salary'],
+            'days_worked' => $request['days_worked'],
+            'position' => $request['position']
         ]);
         return response()->json([
-            'message'=>'update successfully',
-            'employee'=>$employee
+            'message' => 'update successfully',
+            'employee' => $employee
         ]);
     }
 
@@ -115,77 +115,66 @@ class EmployeeController extends Controller
     public function destroy(string $id)
     {
         $employee = Employee::find($id);
-        if (!$employee){
+        if (!$employee) {
             return response()->json([
-            'message'=> 'no employee'
+                'message' => 'no employee'
             ]);
         }
         $employee->delete();
         return response()->json([
-            'message'=>'deleted successfully'
+            'message' => 'deleted successfully'
         ]);
     }
-    public function searchEmployee(Request $request){
+
+    public function searchEmployee(Request $request)
+    {
         $search = $request->input('search');
         $employee = Employee::where('name', 'like', "%$search%")
             ->get();
         return response()->json([
-            'result'=> $employee
+            'result' => $employee
         ]);
+
     }
-    public function getAttendance(Request $request, $employeeId)
+
+    public function getEmployeeWorkDays(Request $request, $employeeId)
     {
-        // التحقق من الموظف
-        $employee = Employee::find($employeeId);
+        // التحقق من أن المستخدم أرسل الشهر المطلوب
+        $request->validate([
+            'month' => 'required|date_format:Y-m', // صيغة الشهر المطلوب (YYYY-MM)
+        ]);
 
-        if (!$employee) {
-            return response()->json(['error' => 'Employee not found'], 404);
-        }
+        $month = $request->input('month'); // الشهر المطلوب
+        $employee = Employee::with('salaries')->findOrFail($employeeId); // جلب الموظف مع المرتبات
 
-        // التحقق من وجود الشهر المطلوب
-        $month = $request->input('month');
-        $year = $request->input('year');
+        $workDays = []; // لتخزين الأيام حسب الشهر
+        $attendanceCount = 0; // عدد أيام الحضور
+        $absenceCount = 0; // عدد أيام الغياب
 
-        if (!$month || !$year) {
-            return response()->json(['error' => 'Month and year are required'], 400);
-        }
-
-        // جلب أيام العمل الخاصة بالموظف
-        $daysWorked = collect($employee->days_worked);
-
-        // تصفية الأيام حسب الشهر المطلوب
-        $attendance = $daysWorked->filter(function ($day) use ($month, $year) {
-            $date = Carbon::parse($day['date']);
-            return $date->month == $month && $date->year == $year;
-        });
-
-        // تنسيق البيانات للتقويم
-        $calendar = [];
-        $totalPresent = 0;
-        $totalAbsent = 0;
-
-        foreach ($attendance as $day) {
-            $status = $day['status']; // الحالة (حضور/غياب)
-            $calendar[] = [
-                'date' => $day['date'],
-                'status' => $status
-            ];
-
-            if ($status == 'present') {
-                $totalPresent++;
-            } elseif ($status == 'absent') {
-                $totalAbsent++;
+        // معالجة بيانات الأيام
+        if ($employee->days_worked) {
+            foreach ($employee->days_worked as $day => $status) {
+                // التأكد أن التاريخ يطابق الشهر المطلوب
+                if (str_starts_with($day, $month)) {
+                    $workDays[$day] = $status; // تخزين اليوم والحالة
+                    if ($status === 'present') {
+                        $attendanceCount++; // حساب الحضور
+                    } elseif ($status === 'absent') {
+                        $absenceCount++; // حساب الغياب
+                    }
+                }
             }
         }
 
         return response()->json([
-            'employee_id' => $employeeId,
+            'employee_name' => $employee->name,
             'month' => $month,
-            'year' => $year,
-            'calendar' => $calendar,
-            'total_present' => $totalPresent,
-            'total_absent' => $totalAbsent
+            'work_days' => $workDays,
+            'attendance_count' => $attendanceCount,
+            'absence_count' => $absenceCount,
         ]);
     }
-
 }
+
+
+

@@ -20,7 +20,7 @@ class EmployeeFactory extends Factory
             'UAE_residency_number' => $this->faker->numerify('########'),
             'unified_number' => $this->faker->numerify('########'),
             'salary' => $this->faker->numberBetween(5000, 20000),
-            'days_worked' => json_encode($this->faker->randomElements(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], 5)),
+            'days_worked' => collect(range(1, 5))->map(fn () => $this->faker->dateTimeBetween('2024-01-01', '2024-12-31')->format('Y-m-d'))->toArray(),
             'position'=>$this->faker->jobTitle(),
         ];
     }
