@@ -139,29 +139,24 @@ class EmployeeController extends Controller
 
     public function getEmployeeWorkDays(Request $request, $employeeId)
     {
-        // التحقق من أن المستخدم أرسل الشهر المطلوب
         $request->validate([
-            'month' => 'required|date_format:Y-m', // صيغة الشهر المطلوب (YYYY-MM)
+            'month' => 'required|date_format:Y-m',
+            'employee_id'=>'required | exists:employees,id'
         ]);
 
-        $month = $request->input('month'); // الشهر المطلوب
-        $employee = Employee::with('salaries')->findOrFail($employeeId); // جلب الموظف مع المرتبات
+        $month = $request->input('month'); // Required month
+        $employee = Employee::with('salaries')->findOrFail($employeeId); // Fetch employee with salaries
 
-        $workDays = []; // لتخزين الأيام حسب الشهر
-        $attendanceCount = 0; // عدد أيام الحضور
-        $absenceCount = 0; // عدد أيام الغياب
+        $workDays = []; // To store days for the specified month
+        $attendanceCount = 0; // Number of attendance days
 
-        // معالجة بيانات الأيام
+        // Process the days data
         if ($employee->days_worked) {
-            foreach ($employee->days_worked as $day => $status) {
-                // التأكد أن التاريخ يطابق الشهر المطلوب
+            foreach ($employee->days_worked as $day) {
+                // Ensure the date matches the required month
                 if (str_starts_with($day, $month)) {
-                    $workDays[$day] = $status; // تخزين اليوم والحالة
-                    if ($status === 'present') {
-                        $attendanceCount++; // حساب الحضور
-                    } elseif ($status === 'absent') {
-                        $absenceCount++; // حساب الغياب
-                    }
+                    $workDays[] = $day; // Store the day
+                    $attendanceCount++; // Count attendance
                 }
             }
         }
@@ -171,7 +166,7 @@ class EmployeeController extends Controller
             'month' => $month,
             'work_days' => $workDays,
             'attendance_count' => $attendanceCount,
-            'absence_count' => $absenceCount,
+            'absence_count' => null, // Absence count not applicable
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -11,7 +12,10 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        //
+    $invoices = Invoice::all();
+    return response()->json([
+        'invoice'=>$invoices ,
+    ]);
     }
 
     /**
@@ -19,7 +23,6 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -27,7 +30,19 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $invoice = Invoice::create([
+            'estate_id'=>$request['estate_id'],
+            'meter_number'=>$request['meter_number'],
+            'account_number'=>$request['account_number'],
+            'total_invoice_amount'=>$request['total_invoice_amount'],
+            'type'=>$request['type'],
+            'date'=>$request['date']
+        ]);
+        $invoice->save();
+        return response()->json([
+            'message'=>'created successfully',
+            'invoice'=>$invoice
+        ]);
     }
 
     /**
@@ -35,7 +50,10 @@ class InvoiceController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $invoice = Invoice::find($id);
+        return response()->json([
+            'invoice'=>$invoice
+        ]);
     }
 
     /**
