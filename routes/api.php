@@ -51,3 +51,4 @@ Route::apiResource('salaryDate', \App\Http\Controllers\MonthlyEmployeeSalaryDate
 Route::get('salaryDate/show/{id}',[\App\Http\Controllers\MonthlyEmployeeSalaryDateController::class ,'showSalaryPayments']);
 
 Route::apiResource('invoice',\App\Http\Controllers\InvoiceController::class);
+Route::apiResource('invoicePayment',\App\Http\Controllers\InvoicePaymentController::class);

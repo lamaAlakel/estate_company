@@ -38,10 +38,10 @@ class MonthlyEmployeeSalaryDateController extends Controller
             'amount' => 'required|numeric|min:0',
             'monthly_employee_salary_id' => 'required|exists:monthly_employee_salaries,id',
         ]);
-        $monthly_employee_salary = MonthlyEmployeeSalaryDate::find($validated['monthly_employee_salary_id']) ;
+        $monthly_employee_salary = MonthlyEmployeeSalary::find($validated['monthly_employee_salary_id']) ;
         if(!$monthly_employee_salary){
             return response()->json([
-                'message'=>'$monthly_employee_salary not found'
+                'message'=>'monthly_employee_salary not found'
             ],404);
         }
         $date = MonthlyEmployeeSalaryDate::create($validated);

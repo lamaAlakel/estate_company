@@ -69,7 +69,25 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $invoice = Invoice::find($id);
+        if(!$invoice){
+            return response()->json([
+                'message'=>'not found'
+            ]);
+        }
+        $invoice->update([
+            'estate_id'=>$request['estate_id'],
+            'meter_number'=>$request['meter_number'],
+            'account_number'=>$request['account_number'],
+            'total_invoice_amount'=>$request['total_invoice_amount'],
+            'type'=>$request['type'],
+            'date'=>$request['date'],
+        ]);
+        return response()->json([
+            'message'=>'updated successfully',
+            'invoice'=>$invoice
+        ]);
+
     }
 
     /**
@@ -77,6 +95,16 @@ class InvoiceController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $invoice = Invoice::find($id);
+        if (!$invoice){
+            return response()->json([
+                'message'=>'invoice not found',
+            ]);
+        }
+        $invoice->delete();
+        return response()->json([
+            'message'=>'deleted successfully',
+        ]);
     }
+
 }
