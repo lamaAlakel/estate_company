@@ -107,4 +107,35 @@ class InvoiceController extends Controller
         ]);
     }
 
+    public function filter(Request $request)
+    {
+        $query = Invoice::query();
+
+        // تطبيق الفلترة حسب النوع
+        if ($request->has('type')) {
+            $query->where('type', $request->input('type'));
+        }
+
+        // تطبيق الفلترة حسب رقم العداد
+        if ($request->has('meter_number')) {
+            $query->where('meter_number', $request->input('meter_number'));
+        }
+
+        // تطبيق الفلترة حسب التاريخ
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('date', [
+                $request->input('start_date'),
+                $request->input('end_date')
+            ]);
+        } elseif ($request->has('start_date')) {
+            $query->where('date', '>=', $request->input('start_date'));
+        } elseif ($request->has('end_date')) {
+            $query->where('date', '<=', $request->input('end_date'));
+        }
+
+        return response()->json([
+            'query'=> $query->get() ,
+        ]);
+    }
+
 }

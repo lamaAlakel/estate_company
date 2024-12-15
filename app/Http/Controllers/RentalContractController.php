@@ -185,5 +185,4 @@ class RentalContractController extends Controller
 
     }
 
-
 }
