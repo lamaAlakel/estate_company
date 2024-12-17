@@ -26,7 +26,7 @@ Route::post('/estate/statistics', [\App\Http\Controllers\EstateController::class
 Route::apiResource('contract', \App\Http\Controllers\RentalContractController::class);
 Route::get('contract/index/{estate_id}',[\App\Http\Controllers\RentalContractController::class,'indexByEstate']);
 Route::post('filter-contract',[\App\Http\Controllers\RentalContractController::class,'filterContracts']);
-Route::get('contract/show/{id}',[\App\Http\Controllers\RentalContractController::class ,'showContractBYTenant']);
+Route::get('contract/show/{client_id}',[\App\Http\Controllers\RentalContractController::class ,'showContractBYTenant']);
 
 
 

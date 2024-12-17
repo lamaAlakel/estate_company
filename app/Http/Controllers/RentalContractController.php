@@ -21,24 +21,29 @@ class RentalContractController extends Controller
         ]);
     }
 
-    public function indexByEstate( $estate){
+    public function indexByEstate($estate)
+    {
+        $estate = Estate::find($estate);
+        if (!$estate) {
+            return response()->json([
+                'message' => 'The estate not found'
+            ], 404);
+        }
 
-        $estate_id =Estate::find($estate);
-        if (!$estate_id) {
+        // Load contracts along with the tenant relationship
+        $contracts = $estate->contracts()->with('tenant')->get();
+
+        if ($contracts->isEmpty()) {
             return response()->json([
-                'message' => 'the estate not found'
+                'message' => 'The estate is not rented'
             ]);
         }
-        $contract = $estate_id-> contracts; // $contract = RentalContract :: where('estate_id',$estate)->get();
-        if ($contract->isEmpty()) {
-            return response()->json([
-                'message'=> 'the estate is not rented'
-            ]);
-        }
+
         return response()->json([
-            'contract'=> $contract
+            'contract' => $contracts
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -173,7 +178,7 @@ class RentalContractController extends Controller
 
     public function showContractBYTenant($tenant_id){
 
-        $contract = RentalContract::where('tenant_id',$tenant_id)->get();
+        $contract = RentalContract::where('tenant_id',$tenant_id)->with('estate:id,code')->get();
         if (!$contract){
             return response()->json([
                 'message'=>'not found'

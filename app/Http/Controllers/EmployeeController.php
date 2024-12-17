@@ -143,58 +143,60 @@ class EmployeeController extends Controller
             'month' => 'required|date_format:Y-m',
         ]);
 
-        $month = $request->input('month'); // Required month
-        $employee = Employee::with('salaries')->findOrFail($employeeId); // Fetch employee with salaries
+        $month = $request->input('month'); // Month requested
+        $employee = Employee::with('salaries')->findOrFail($employeeId);
 
-        $workDays = []; // To store days for the specified month
-        $attendanceCount = 0; // Number of attendance days
+        // Filter days_worked for the specified month
+        $workDays = array_filter($employee->days_worked ?? [], function ($day) use ($month) {
+            return str_starts_with($day, $month);
+        });
 
-        // Process the days data
-        if ($employee->days_worked) {
-            foreach ($employee->days_worked as $day) {
-                // Ensure the date matches the required month
-                if (str_starts_with($day, $month)) {
-                    $workDays[] = $day; // Store the day
-                    $attendanceCount++; // Count attendance
-                }
-            }
-        }
+        $attendanceCount = count($workDays); // Number of attendance days
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, explode('-', $month)[1], explode('-', $month)[0]); // Total days in month
+        $absenceCount = $daysInMonth - $attendanceCount;
 
         return response()->json([
             'employee_name' => $employee->name,
             'month' => $month,
-            'work_days' => $workDays,
+            'work_days' => array_values($workDays), // Reset array keys
             'attendance_count' => $attendanceCount,
-            'absence_count' => null, // Absence count not applicable
+            'absence_count' => $absenceCount,
         ]);
     }
 
     public function updateDaysWorked(Request $request, $id)
     {
-        // التحقق من صحة البيانات المدخلة
+        // Validate input
         $validated = $request->validate([
-            'days' => 'required|array', // يجب أن تكون الأيام مصفوفة
-            'days.*' => 'date', // كل عنصر في الأيام يجب أن يكون تاريخًا صحيحًا
+            'month' => 'required|date_format:Y-m', // Month format (YYYY-MM)
+            'days' => 'required|array',           // Days worked should be an array
+            'days.*' => 'date_format:Y-m-d',      // Each day must be a valid date
         ]);
 
-        // العثور على الموظف
+        // Find the employee
         $employee = Employee::findOrFail($id);
 
-        // إذا كانت الأيام موجودة، دمجها مع الأيام الحالية
-        $currentDays = $employee->days_worked ?? []; // جلب الأيام الحالية إذا كانت موجودة
+        $month = $validated['month'];  // Month sent by the user
+        $newDays = $validated['days']; // Days worked for the given month
 
-        // دمج الأيام الجديدة مع القديمة
-        $employee->days_worked = array_merge($currentDays, $validated['days']);
+        // Filter out existing days that do not belong to the specified month
+        $existingDays = $employee->days_worked ?? [];
+        $updatedDays = array_filter($existingDays, function ($day) use ($month) {
+            return !str_starts_with($day, $month); // Keep only days outside the given month
+        });
 
-        // حفظ التعديلات
+        // Merge the new days for the month
+        $updatedDays = array_merge($updatedDays, $newDays);
+
+        // Update the employee's days_worked
+        $employee->days_worked = $updatedDays;
         $employee->save();
 
         return response()->json([
             'message' => 'Days worked updated successfully!',
-            'days_worked' => $employee->days_worked,
+            'month' => $month,
+            'days_worked' => $updatedDays,
         ]);
     }
+
 }
-
-
-

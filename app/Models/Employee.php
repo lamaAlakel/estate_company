@@ -22,8 +22,11 @@ class Employee extends Model
         'salary',
         'days_worked',
         'position'
-        ];
+    ];
 
+    protected $hidden =[
+        'days_worked'
+    ];
     public function salaries(){
         return $this->hasMany(MonthlyEmployeeSalary::class ,'employee_id');
     }
