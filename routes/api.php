@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('estate', \App\Http\Controllers\EstateController::class);
 Route::post('/filter-estates', [\App\Http\Controllers\EstateController::class, 'Filter']);
-
+Route::post('/estate/statistics', [\App\Http\Controllers\EstateController::class, 'getStatistics']);
 
 
 Route::apiResource('contract', \App\Http\Controllers\RentalContractController::class);
@@ -44,6 +44,7 @@ Route::post('tenant/search',[\App\Http\Controllers\TenantController::class ,'sea
 Route::apiResource('employee', \App\Http\Controllers\EmployeeController::class);
 Route::post('employee/search',[\App\Http\Controllers\EmployeeController::class ,'searchEmployee']);
 Route::post('employee/workedDays/{employeeId}',[\App\Http\Controllers\EmployeeController::class ,'getEmployeeWorkDays']);
+Route::put('employee/update/workedDays/{employeeId}',[\App\Http\Controllers\EmployeeController::class ,'updateDaysWorked']);
 
 
 
@@ -59,7 +60,7 @@ Route::get('salaryDate/show/{id}',[\App\Http\Controllers\MonthlyEmployeeSalaryDa
 
 Route::apiResource('invoice',\App\Http\Controllers\InvoiceController::class);
 Route::post('invoice/filter',[\App\Http\Controllers\InvoiceController::class,'filter']);
-
+Route::get('/invoice/payments/{id}', [\App\Http\Controllers\InvoiceController::class, 'getInvoicePayments']);
 
 Route::apiResource('invoicePayment',\App\Http\Controllers\InvoicePaymentController::class);
 

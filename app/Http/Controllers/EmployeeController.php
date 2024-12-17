@@ -168,6 +168,32 @@ class EmployeeController extends Controller
             'absence_count' => null, // Absence count not applicable
         ]);
     }
+
+    public function updateDaysWorked(Request $request, $id)
+    {
+        // التحقق من صحة البيانات المدخلة
+        $validated = $request->validate([
+            'days' => 'required|array', // يجب أن تكون الأيام مصفوفة
+            'days.*' => 'date', // كل عنصر في الأيام يجب أن يكون تاريخًا صحيحًا
+        ]);
+
+        // العثور على الموظف
+        $employee = Employee::findOrFail($id);
+
+        // إذا كانت الأيام موجودة، دمجها مع الأيام الحالية
+        $currentDays = $employee->days_worked ?? []; // جلب الأيام الحالية إذا كانت موجودة
+
+        // دمج الأيام الجديدة مع القديمة
+        $employee->days_worked = array_merge($currentDays, $validated['days']);
+
+        // حفظ التعديلات
+        $employee->save();
+
+        return response()->json([
+            'message' => 'Days worked updated successfully!',
+            'days_worked' => $employee->days_worked,
+        ]);
+    }
 }
 
 

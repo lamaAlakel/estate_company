@@ -143,5 +143,68 @@ class EstateController extends Controller
         ]);
     }
 
+    public function getStatistics(Request $request)
+    {
+
+        // Validate the request inputs
+        $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:1900|max:' . now()->year,
+        ]);
+
+        $month = $request->month;
+        $year = $request->year;
+
+        // Get overall statistics
+        $rentedCount = Estate::whereHas('contracts', function ($query) use ($month, $year) {
+            $query->whereYear('start_date', $year)
+                ->whereMonth('start_date', $month);
+        })->count();
+
+        $totalEstates = Estate::count();
+        $emptyCount = $totalEstates - $rentedCount;
+
+        $totalIncome = Estate::with('invoices')
+            ->get()
+            ->flatMap(function ($estate) use ($month, $year) {
+                return $estate->invoices->filter(function ($invoice) use ($month, $year) {
+                    return $invoice->date->year == $year && $invoice->date->month == $month;
+                });
+            })->sum('amount');
+
+        // Get statistics by type
+        $statisticsByType = Estate::with(['contracts', 'invoices'])
+            ->get()
+            ->groupBy('type')
+            ->map(function ($group) use ($month, $year) {
+                $rentedCount = $group->pluck('contracts')->flatten()
+                    ->filter(function ($contract) use ($month, $year) {
+                        return $contract->start_date->year == $year && $contract->start_date->month == $month;
+                    })->count();
+
+                $totalIncome = $group->pluck('invoices')->flatten()
+                    ->filter(function ($invoice) use ($month, $year) {
+                        return $invoice->date->year == $year && $invoice->date->month == $month;
+                    })->sum('amount');
+
+                return [
+                    'rented_count' => $rentedCount,
+                    'empty_count' => $group->count() - $rentedCount,
+                    'total_income' => $totalIncome,
+                ];
+            });
+
+        // Return the result as a JSON response
+        return response()->json([
+            'overall' => [
+                'rented_count' => $rentedCount,
+                'empty_count' => $emptyCount,
+                'total_income' => $totalIncome,
+            ],
+            'by_type' => $statisticsByType,
+        ]);
+    }
+
+
 
 }

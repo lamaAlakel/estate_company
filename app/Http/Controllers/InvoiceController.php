@@ -12,10 +12,18 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-    $invoices = Invoice::all();
-    return response()->json([
-        'invoice'=>$invoices ,
-    ]);
+        // جلب جميع الفواتير مع مجموع الدفعات لكل فاتورة
+        $invoices = Invoice::with('payments')
+            ->get()
+            ->map(function ($invoice) {
+                // حساب مجموع الدفعات لكل فاتورة
+                $invoice->total_payments = $invoice->payments->sum('amount');
+                return $invoice;
+            });
+
+        // إرجاع الفواتير مع مجموع الدفعات كـJSON
+        return response()->json($invoices);
+
     }
 
     /**
@@ -135,6 +143,21 @@ class InvoiceController extends Controller
 
         return response()->json([
             'query'=> $query->get() ,
+        ]);
+    }
+    public function getInvoicePayments($invoiceId)
+    {
+        // البحث عن الفاتورة باستخدام معرفها
+        $invoice = Invoice::with('payments')->find($invoiceId);
+
+        // التحقق من وجود الفاتورة
+        if (!$invoice) {
+            return response()->json(['message' => 'Invoice not found'], 404);
+        }
+       $invoice_payment = $invoice->payments;
+
+        return response()->json([
+            'invoice_payment'=> $invoice_payment
         ]);
     }
 

@@ -109,4 +109,5 @@ class InvoicePaymentController extends Controller
             'message'=>'deleted successfully'
         ]);
     }
+
 }
