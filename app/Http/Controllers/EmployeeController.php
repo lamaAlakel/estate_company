@@ -199,4 +199,55 @@ class EmployeeController extends Controller
         ]);
     }
 
+    public function getEmployeesWithExpirations()
+    {
+        // Get the current date and 2 months from now
+        $currentDate = Carbon::now();
+        $thresholdDate = $currentDate->copy()->addMonths(2);
+
+        // Query employees and calculate days to expiration
+        $employees = Employee::select(
+            'name',
+            'passport_expiration_date',
+            'visa_expiration_date'
+        )->get()->map(function ($employee) use ($currentDate, $thresholdDate) {
+            // Calculate days to passport expiration
+            $passportDays = $employee->passport_expiration_date
+                ? Carbon::parse($employee->passport_expiration_date)->diffInDays($currentDate) *
+                (Carbon::parse($employee->passport_expiration_date)->isPast() ? -1 : 1)
+                : null;
+
+            // Calculate days to visa expiration
+            $visaDays = $employee->visa_expiration_date
+                ? Carbon::parse($employee->visa_expiration_date)->diffInDays($currentDate) *
+                (Carbon::parse($employee->visa_expiration_date)->isPast() ? -1 : 1)
+                : null;
+
+            return [
+                'name' => $employee->name,
+                'passport_expiration_date' => $employee->passport_expiration_date,
+                'days_to_passport_expiration' => $passportDays,
+                'visa_expiration_date' => $employee->visa_expiration_date,
+                'days_to_visa_expiration' => $visaDays,
+                'passport_expired' => $passportDays !== null && $passportDays < 0,
+                'visa_expired' => $visaDays !== null && $visaDays < 0,
+                'passport_within_2_months' => $passportDays !== null && $passportDays <= 60 && $passportDays >= 0,
+                'visa_within_2_months' => $visaDays !== null && $visaDays <= 60 && $visaDays >= 0,
+            ];
+        });
+
+        // Filter employees for expired or within 2 months
+        $filteredEmployees = $employees->filter(function ($employee) {
+            return $employee['passport_expired'] ||
+                $employee['visa_expired'] ||
+                $employee['passport_within_2_months'] ||
+                $employee['visa_within_2_months'];
+        });
+
+        // Return JSON response
+        return response()->json([
+            'status' => 'success',
+            'data' => $filteredEmployees->values(),
+        ]);
+    }
 }

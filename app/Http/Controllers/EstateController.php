@@ -6,6 +6,7 @@ use App\Models\Estate;
 use Carbon\Carbon;
 use http\Client\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 class EstateController extends Controller
@@ -145,13 +146,6 @@ class EstateController extends Controller
 
     public function getStatistics(Request $request)
     {
-
-        // Validate the request inputs
-        $request->validate([
-            'month' => 'required|integer|min:1|max:12',
-            'year' => 'required|integer|min:1900|max:' . now()->year,
-        ]);
-
         $month = $request->month;
         $year = $request->year;
 
@@ -207,4 +201,116 @@ class EstateController extends Controller
 
 
 
+    public function getRentedEstatesWithPayments(Request $request)
+    {
+        $month = $request->input('month'); // Format: YYYY-MM
+        $startDate = $month ? $month . '-01' : now()->startOfMonth()->toDateString();
+        $endDate = $month ? date('Y-m-t', strtotime($startDate)) : now()->endOfMonth()->toDateString();
+
+        // Define all possible types
+        $estateTypes = ['room', 'office', 'commercial_shop'];
+
+        // Query to count rented estates grouped by type
+        $rentedEstates = Estate::select('type', DB::raw('COUNT(*) as count'))
+            ->whereHas('contracts', function ($query) use ($startDate, $endDate) {
+                $query->where('rent_start_date', '<=', $endDate)
+                    ->where('rent_end_date', '>=', $startDate);
+            })
+            ->groupBy('type')
+            ->pluck('count', 'type');
+
+        // Query to sum payments grouped by estate type
+        $estatePayments = Estate::join('rental_contracts', 'estates.id', '=', 'rental_contracts.estate_id')
+            ->join('rental_contract_payments', 'rental_contracts.id', '=', 'rental_contract_payments.rental_contract_id')
+            ->whereBetween('rental_contract_payments.date', [$startDate, $endDate])
+            ->select('estates.type', DB::raw('SUM(rental_contract_payments.amount) as total_payment'))
+            ->groupBy('estates.type')
+            ->pluck('total_payment', 'estates.type');
+
+        // Initialize all types with 0 for both count and payment
+        $result = [];
+        foreach ($estateTypes as $type) {
+            $result[$type] = [
+                'count' => $rentedEstates[$type] ?? 0,
+                'total_payment' => $estatePayments[$type] ?? 0,
+            ];
+        }
+
+        // Return JSON response with grouped data
+        return response()->json([
+            'status' => 'success',
+            'data' => $result
+        ]);
+    }
+
+    public function getFinancialReport(Request $request)
+    {
+        // Validate and extract start and end dates
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        if (!$startDate || !$endDate) {
+            return response()->json(['status' => 'error', 'message' => 'Start and end dates are required'], 400);
+        }
+
+        // Incoming: Sum of rental contract payments
+        $incoming = DB::table('rental_contract_payments')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('amount');
+
+        // Outgoing: Monthly employee salaries (from salary dates)
+        $employeeSalaryOut = DB::table('monthly_employee_salary_dates')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('amount');
+
+        // Outgoing: Invoice payments
+        $invoicePaymentOut = DB::table('invoice_payments')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('amount');
+
+        // Outgoing: Purchases and maintenance
+        $purchaseAndMaintenanceOut = DB::table('purchase_and_maintenances')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('total_paid');
+
+        // Calculate totals
+        $totalOutgoing = $employeeSalaryOut + $invoicePaymentOut + $purchaseAndMaintenanceOut;
+        $total = $incoming - $totalOutgoing;
+
+        // Response structure
+        $result = [
+            'status' => 'success',
+            'data' => [
+                'incoming' => $incoming,
+                'outgoing' => [
+                    'employee_salaries' => $employeeSalaryOut,
+                    'invoice_payments' => $invoicePaymentOut,
+                    'purchases_and_maintenance' => $purchaseAndMaintenanceOut,
+                    'total_outgoing' => $totalOutgoing,
+                ],
+                'total' => $total,
+            ]
+        ];
+
+        // Return JSON response
+        return response()->json($result);
+    }
+    public function getEstatesWithExpiringContracts(Request $request)
+    {
+        // Get paginated estates with current contracts nearing expiration
+        $estates = Estate::with(['contracts' => function ($query) {
+            $query->where('rent_end_date', '>=', now())
+                ->orderBy('rent_end_date', 'asc'); // Sort by expiration date
+        }])
+            ->whereHas('contracts', function ($query) {
+                $query->where('rent_end_date', '>=', now());
+            })
+            ->paginate(10); // Use pagination with 10 items per page
+
+        // Format response
+        return response()->json([
+            'status' => 'success',
+            'data' => $estates
+        ]);
+    }
 }

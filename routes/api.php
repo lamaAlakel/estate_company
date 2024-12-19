@@ -20,7 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('estate', \App\Http\Controllers\EstateController::class);
 Route::post('/filter-estates', [\App\Http\Controllers\EstateController::class, 'Filter']);
-Route::post('/estate/statistics', [\App\Http\Controllers\EstateController::class, 'getStatistics']);
+Route::post('/statistics/rented-estates', [\App\Http\Controllers\EstateController::class, 'getRentedEstatesWithPayments']);
+Route::post('/statistics/getFinancialReport', [\App\Http\Controllers\EstateController::class, 'getFinancialReport']);
+Route::get('estates-expiring-contracts', [\App\Http\Controllers\EstateController::class, 'getEstatesWithExpiringContracts']);
 
 
 Route::apiResource('contract', \App\Http\Controllers\RentalContractController::class);
@@ -45,7 +47,7 @@ Route::apiResource('employee', \App\Http\Controllers\EmployeeController::class);
 Route::post('employee/search',[\App\Http\Controllers\EmployeeController::class ,'searchEmployee']);
 Route::post('employee/workedDays/{employeeId}',[\App\Http\Controllers\EmployeeController::class ,'getEmployeeWorkDays']);
 Route::put('employee/update/workedDays/{employeeId}',[\App\Http\Controllers\EmployeeController::class ,'updateDaysWorked']);
-
+Route::get('/employees-expiration', [\App\Http\Controllers\EmployeeController::class, 'getEmployeesWithExpirations']);
 
 
 Route::apiResource('salary', \App\Http\Controllers\MonthlyEmployeeSalaryController::class);

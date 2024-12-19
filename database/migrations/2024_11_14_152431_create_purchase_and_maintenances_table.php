@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('purchase_and_maintenances', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->date('date');
             $table->integer('quantity');
             $table->integer('unit_cost');
-            $table->integer('total_paid');
+            $table->integer('total_paid');            $table->date('date');
+
             $table->timestamps();
         });
     }
