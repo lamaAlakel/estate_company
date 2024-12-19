@@ -21,9 +21,10 @@ class InvoiceController extends Controller
                 return $invoice;
             });
 
-        // إرجاع الفواتير مع مجموع الدفعات كـJSON
-        return response()->json($invoices);
 
+        return response()->json([
+            'invoices'=>$invoices
+        ]);
     }
 
     /**
