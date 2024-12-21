@@ -145,7 +145,7 @@ class EmployeeController extends Controller
 
         $month = $request->input('month'); // Month requested
         $employee = Employee::with('salaries')->findOrFail($employeeId);
-
+        dd($employee);
         // Ensure days_worked is always treated as an array
         $daysWorked = is_array($employee->days_worked) ? $employee->days_worked : json_decode($employee->days_worked, true) ?? [];
 
