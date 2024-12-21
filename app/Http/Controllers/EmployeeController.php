@@ -146,15 +146,16 @@ class EmployeeController extends Controller
         $month = $request->input('month'); // Month requested
         $employee = Employee::with('salaries')->findOrFail($employeeId);
 
-        $existingDays = $employee->days_worked ?? [];
+        // Ensure days_worked is always treated as an array
+        $daysWorked = is_array($employee->days_worked) ? $employee->days_worked : json_decode($employee->days_worked, true) ?? [];
 
         // Filter days_worked for the specified month
-        $workDays = array_filter($employee->days_worked ?? [], function ($day) use ($month) {
+        $workDays = array_filter($daysWorked, function ($day) use ($month) {
             return str_starts_with($day, $month);
         });
 
         $attendanceCount = count($workDays); // Number of attendance days
-        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, explode('-', $month)[1], explode('-', $month)[0]); // Total days in month
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, (int) explode('-', $month)[1], (int) explode('-', $month)[0]); // Total days in month
         $absenceCount = $daysInMonth - $attendanceCount;
 
         return response()->json([
