@@ -146,6 +146,8 @@ class EmployeeController extends Controller
         $month = $request->input('month'); // Month requested
         $employee = Employee::with('salaries')->findOrFail($employeeId);
 
+        $existingDays = $employee->days_worked ?? [];
+
         // Filter days_worked for the specified month
         $workDays = array_filter($employee->days_worked ?? [], function ($day) use ($month) {
             return str_starts_with($day, $month);
