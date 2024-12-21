@@ -35,7 +35,7 @@ class RentalContractController extends Controller
 
         if ($contracts->isEmpty()) {
             return response()->json([
-                'message' => 'The estate is not rented'
+                'contract' => []
             ]);
         }
 
