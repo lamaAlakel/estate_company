@@ -100,7 +100,6 @@ class EmployeeController extends Controller
             'UAE_residency_number' => $request['UAE_residency_number'],
             'unified_number' => $request['unified_number'],
             'salary' => $request['salary'],
-            'days_worked' => [],
             'position' => $request['position']
         ]);
         return response()->json([
