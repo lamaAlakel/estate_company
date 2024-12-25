@@ -41,7 +41,7 @@ class TenantController extends Controller
          'id_number' => $request['id_number'],
          'phone_number'=> $request['phone_number'],
          'address'=> $request['address'],
-         'id_image' => $path ,
+         'id_image' => $path  ,
      ]);
      $tenant->save();
      return response()->json([
