@@ -63,6 +63,7 @@ Route::get('salaryDate/show/{id}',[\App\Http\Controllers\MonthlyEmployeeSalaryDa
 Route::apiResource('invoice',\App\Http\Controllers\InvoiceController::class);
 Route::post('invoice/filter',[\App\Http\Controllers\InvoiceController::class,'filter']);
 Route::get('/invoice/payments/{id}', [\App\Http\Controllers\InvoiceController::class, 'getInvoicePayments']);
+Route::post('/invoices/unpaid', [\App\Http\Controllers\InvoiceController::class, 'getUnpaidInvoices']);
 
 Route::apiResource('invoicePayment',\App\Http\Controllers\InvoicePaymentController::class);
 

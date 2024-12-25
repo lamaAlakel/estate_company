@@ -7,6 +7,36 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+
+
+    public function getUnpaidInvoices(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'month' => 'required|date_format:Y-m', // Ensure 'month' is in 'YYYY-MM' format
+        ]);
+
+        // Extract the start and end date of the specified month
+        $month = $request->month;
+        $startDate = $month . '-01';
+        $endDate = date('Y-m-t', strtotime($startDate));
+
+        // Query invoices for the specified month and not fully paid
+        $invoices = Invoice::with('payments')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get()
+            ->filter(function ($invoice) {
+                $totalPaid = $invoice->payments->sum('amount');
+                return $totalPaid < $invoice->total_invoice_amount; // Not fully paid
+            });
+
+        // Return the result
+        return response()->json([
+            'status' => 'success',
+            'invoices' => $invoices,
+        ], 200);
+    }
+
     /**
      * Display a listing of the resource.
      */
