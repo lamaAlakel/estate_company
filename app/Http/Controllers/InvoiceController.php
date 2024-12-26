@@ -26,7 +26,7 @@ class InvoiceController extends Controller
             ->get()
             ->filter(function ($invoice) {
                 $totalPaid = $invoice->payments->sum('amount');
-                return $totalPaid === 0; // Completely unpaid
+                return $totalPaid < $invoice->total_invoice_amount; // Not fully paid
             })
             ->values(); // Reset collection keys
 
