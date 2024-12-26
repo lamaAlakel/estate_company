@@ -23,20 +23,37 @@ class InvoiceController extends Controller
 
         // Query invoices for the specified month and not fully paid
         $invoices = Invoice::with('payments')
-            ->whereBetween('date', [$startDate, $endDate])
+            ->where('date', '<', $endDate) // Before the specified month
             ->get()
             ->filter(function ($invoice) {
                 $totalPaid = $invoice->payments->sum('amount');
                 return $totalPaid < $invoice->total_invoice_amount; // Not fully paid
             });
 
+        $mappedInvoices = $invoices->map(function ($invoice) {
+            return [
+                'invoice_id' => $invoice->id,
+                'estate_id' => $invoice->estate_id,
+                'estate_name' => optional($invoice->estate)->name, // Assuming 'name' is a field in Estate
+                'total_invoice_amount' => $invoice->total_invoice_amount,
+                'type' => $invoice->type,
+                'date' => $invoice->date,
+                'payments' => $invoice->payments->map(function ($payment) {
+                    return [
+                        'payment_id' => $payment->id,
+                        'amount' => $payment->amount,
+                        'date' => $payment->date,
+                    ];
+                }),
+            ];
+        });
+
         // Return the result
         return response()->json([
             'status' => 'success',
-            'invoices' => $invoices,
+            'unpaid_invoices' => $mappedInvoices,
         ], 200);
     }
-
     /**
      * Display a listing of the resource.
      */
