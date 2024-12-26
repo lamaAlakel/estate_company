@@ -16,25 +16,28 @@ class InvoiceController extends Controller
             'month' => 'required|date_format:Y-m', // Ensure 'month' is in 'YYYY-MM' format
         ]);
 
-        // Extract the start and end date of the specified month
+        // Extract the end date of the specified month
         $month = $request->month;
-        $startDate = $month . '-01';
-        $endDate = date('Y-m-t', strtotime($startDate));
+        $endDate = date('Y-m-t', strtotime($month . '-01')); // Last day of the specified month
 
-        // Query invoices for the specified month and not fully paid
+        // Query invoices before the specified month and completely unpaid
         $invoices = Invoice::with('payments')
             ->where('date', '<', $endDate) // Before the specified month
             ->get()
             ->filter(function ($invoice) {
                 $totalPaid = $invoice->payments->sum('amount');
-                return $totalPaid < $invoice->total_invoice_amount; // Not fully paid
-            });
+                return $totalPaid === 0; // Completely unpaid
+            })
+            ->values(); // Reset collection keys
 
+        // Map the response to a list format
         $mappedInvoices = $invoices->map(function ($invoice) {
             return [
                 'invoice_id' => $invoice->id,
                 'estate_id' => $invoice->estate_id,
                 'estate_name' => optional($invoice->estate)->name, // Assuming 'name' is a field in Estate
+                'meter_number' => $invoice->meter_number,
+                'account_number' => $invoice->account_number,
                 'total_invoice_amount' => $invoice->total_invoice_amount,
                 'type' => $invoice->type,
                 'date' => $invoice->date,
@@ -44,16 +47,17 @@ class InvoiceController extends Controller
                         'amount' => $payment->amount,
                         'date' => $payment->date,
                     ];
-                }),
+                })->toArray(),
             ];
-        });
+        })->toArray();
 
         // Return the result
         return response()->json([
             'status' => 'success',
-            'unpaid_invoices' => $mappedInvoices,
+            'unpaid_invoices' => $mappedInvoices, // List format
         ], 200);
     }
+
     /**
      * Display a listing of the resource.
      */
