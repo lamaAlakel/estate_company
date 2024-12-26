@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('rent_start_date');
             $table->date('rent_end_date');
-            $table->enum('type',['cash','installment','visaCard']);
+            $table->enum('type',['cash','check']);
             $table->integer('monthly_rent');
             $table->foreignId('estate_id')->constrained('estates')->OnDelete('cascade');
             $table->foreignId('tenant_id')->constrained('tenants')->onDelete('cascade');
