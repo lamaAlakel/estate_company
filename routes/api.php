@@ -40,6 +40,7 @@ Route::post('contractPayment/filter',[\App\Http\Controllers\RentalContractPaymen
 
 Route::apiResource('tenant', \App\Http\Controllers\TenantController::class);
 Route::post('tenant/search',[\App\Http\Controllers\TenantController::class ,'searchTenant']);
+Route::post('tenant/{id}',[\App\Http\Controllers\TenantController::class ,'update']);
 
 
 

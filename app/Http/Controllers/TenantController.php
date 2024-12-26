@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Traits\ImageTrait;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
@@ -8,14 +9,15 @@ use Illuminate\Http\Request;
 class TenantController extends Controller
 {
     use ImageTrait;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $tenant =Tenant::all();
+        $tenant = Tenant::all();
         return response()->json([
-            'tenants'=> $tenant
+            'tenants' => $tenant
         ]);
     }
 
@@ -26,27 +28,27 @@ class TenantController extends Controller
     {
         //
     }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-            $path = null ;
-        if ($request->hasFile('id_image'))
-        {
-            $path = $this->storefile($request->file('id_image') , 'Tenant/id_image') ;
+        $path = null;
+        if ($request->hasFile('id_image')) {
+            $path = $this->storefile($request->file('id_image'), 'Tenant/id_image');
         }
-     $tenant = Tenant::create([
-         'full_name'=> $request['full_name'],
-         'id_number' => $request['id_number'],
-         'phone_number'=> $request['phone_number'],
-         'address'=> $request['address'],
-         'id_image' => $path  ,
-     ]);
-     $tenant->save();
-     return response()->json([
-         'message'=> 'added tenant successfully'
-     ]);
+        $tenant = Tenant::create([
+            'full_name' => $request['full_name'],
+            'id_number' => $request['id_number'],
+            'phone_number' => $request['phone_number'],
+            'address' => $request['address'],
+            'id_image' => $path,
+        ]);
+        $tenant->save();
+        return response()->json([
+            'message' => 'added tenant successfully'
+        ]);
     }
 
     /**
@@ -71,27 +73,26 @@ class TenantController extends Controller
     public function update(Request $request, string $id)
     {
         $tenant = Tenant::find($id);
-        if(!$tenant) {
+        if (!$tenant) {
             return response()->json([
                 'message' => 'no tenant'
             ]);
         }
-        $path = null ;
-        if ($request->hasFile('id_image'))
-        {
-            $path = $this->storefile($request->file('id_image') , 'Tenant/id_image') ;
+        $path = null;
+        if ($request->hasFile('id_image')) {
+            $path = $this->storefile($request->file('id_image'), 'Tenant/id_image');
         }
         $tenant->update([
-            'full_name'=> $request['full_name'],
+            'full_name' => $request['full_name'],
             'id_number' => $request['id_number'],
-            'phone_number'=> $request['phone_number'],
-            'address'=> $request['address'],
-            'id_image' => $path ,
-            ]);
-            return response()->json([
-                'message'=>'updated successfully' ,
-                'tenant'=> $tenant
-            ]);
+            'phone_number' => $request['phone_number'],
+            'address' => $request['address'],
+            'id_image' => $path,
+        ]);
+        return response()->json([
+            'message' => 'updated successfully',
+            'tenant' => $tenant
+        ]);
     }
 
     /**
@@ -100,14 +101,14 @@ class TenantController extends Controller
     public function destroy(string $id)
     {
         $tenant = Tenant::find($id);
-        if (!$tenant){
+        if (!$tenant) {
             return response()->json([
-                'message'=> 'no tenant',
+                'message' => 'no tenant',
             ]);
         }
         $tenant->delete();
         return response()->json([
-            'message'=>'deleted successfully',
+            'message' => 'deleted successfully',
         ]);
     }
 
@@ -116,13 +117,11 @@ class TenantController extends Controller
         $search = $request->input('search');
         $tenant = Tenant::where('full_name', 'like', "%$search%")
             ->orWhere('id_number', 'like', "%$search%")
-           ->get();
+            ->get();
         return response()->json([
-            'result'=> $tenant
+            'result' => $tenant
         ]);
     }
-
-
 
 
 }
